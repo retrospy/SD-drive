@@ -34,7 +34,7 @@ class Disk
                 bool read(unsigned long offset, byte *buf);
                 bool write(unsigned long offset, byte *buf);
                 char *getFilename(void) { return filename; }
-                bool mount(char *afilename, bool readOnly);
+                void mount(char *afilename, bool readOnly);
                 void unmount(void);
                 bool isMounted(void) { return mountedFlag; }
                 bool isOpen(void) { return isOpenF; }

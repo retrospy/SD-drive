@@ -12,6 +12,7 @@
 //
 // Bob Applegate, K2UT - bob@corshamtech.com
 
+#include <SPI.h>
 #include <SD.h>
 #include "Disk.h"
 #include "Errors.h"
@@ -71,7 +72,7 @@ void Disk::unmount(void)
 // Given a pathname to a file, attempt to open it.  Returns true if mounted,
 // false if not and the error flag is set with the reason.
 
-bool Disk::mount(char *afilename, bool readOnly)
+void Disk::mount(char *afilename, bool readOnly)
 {
         goodFlag = false;    // assume it is not good
         //byte buffer[SECTOR_SIZE];

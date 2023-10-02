@@ -72,20 +72,35 @@ extern bool debounceInputPin(int pin);
 // Define all the ports in symbolic terms so it'll be easy to move ports/pins
 // in the future.
 
-#define LOWER_WRITE  PORTC
-#define LOWER_READ PINC
-#define LOWER_DDR DDRC
+#if defined(ARDUINO_AVR_MEGA2560)
+#define LOWER_WRITE(val) PORTC = val
+#define LOWER_READ(val) val = PINC
+#define LOWER_DDR(val) DDRC = val
 #define LOWER_MASK  0xff
-//#define LOWER_MASK 0x3f
-
-#define UPPER_WRITE  PORTD
-#define UPPER_READ PIND
-#define UPPER_DDR  DDRD
-#define UPPER_MASK  0xc0
 
 #define DIRECTION 47
 #define STROBE 48
 #define ACK 49
+#elif defined(ARDUINO_TEENSY41)
+#define LOWER_WRITE(val) GPIO7_DR = ((val & 0xF) | ((val & 0x30) << 6) | ((val & 0xC0) << 10))
+#define LOWER_READ(val) int temp = GPIO7_PSR; val = ((temp & 0x0F) | ((temp & 0xC00) >> 6) | ((temp & 0x30000) >> 10))
+#define LOWER_DDR(val) GPIO6_GDIR = val
+#define LOWER_MASK  0xff
+
+#define DIRECTION 2
+#define STROBE 3
+#define ACK 4
+#elif defined(ARDUINO_RASPBERRY_PI_PICO)
+#define LOWER_WRITE(val) gpio_put_masked(0x000000FF, val)
+#define LOWER_READ(val) val = (gpio_get_all() & 0x000000FF)
+#define LOWER_DDR(val) gpio_set_dir_masked(0x000000FF, val)
+#define LOWER_MASK  0xff
+
+#define DIRECTION 11
+#define STROBE 12
+#define ACK 13
+#endif
+
 
 
 
@@ -202,7 +217,7 @@ bool Link::poll(void)
 
 void Link::prepareRead(void)
 {
-        LOWER_DDR = (~LOWER_MASK) & 0xff;
+        LOWER_DDR((~LOWER_MASK) & 0xff);
 }
 
 
@@ -222,7 +237,7 @@ void Link::prepareWrite(void)
         while (debounceInputPin(DIRECTION))
                 ;
 
-        LOWER_DDR = LOWER_MASK;
+        LOWER_DDR(LOWER_MASK);
 }
 
 
@@ -241,7 +256,7 @@ void Link::writeByte(byte data)
 
         // Put the byte onto the data port
         
-        LOWER_WRITE = data;
+        LOWER_WRITE(data);
                 
         // raise ACK to indicate data is present, then wait for
         // strobe to go high
@@ -272,7 +287,7 @@ byte Link::readByte(void)
                 
         // Data is available, so grab it right away, then ACK it.
                 
-        data = LOWER_READ;
+        LOWER_READ(data);
         digitalWrite(ACK, HIGH);
                 
         // Wait for host to lower strobe

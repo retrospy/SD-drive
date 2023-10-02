@@ -331,13 +331,21 @@ bool Disks::saveConfig(void)
                                         }
                                         else
                                         {
-                                                ofile.write(key);
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
+                                                ofile.write(&key, 1);
+#else   
+	                                            ofile.write(key);                          
+#endif
                                                 state = STATE_COPY_LINE;  // copy rest of line
                                         }
                                         break;
 
                                 case STATE_COPY_LINE:
-                                        ofile.write(key);   // then fall through
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
+	                                    ofile.write(&key, 1); // then fall through
+#else   
+	                                    ofile.write(key); // then fall through                        
+#endif
 
                                 case STATE_SKIP_LINE:
                                         if (key == '\n')

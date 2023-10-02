@@ -1,0 +1,37 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "SD-drive", "SD-drive\SD-drive.vgdbproj", "{A8B34A44-6306-4362-8652-C3D33B28F226}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Arduino_Mega_or_Mega_2560 = Debug|Arduino_Mega_or_Mega_2560
+		Debug|Teensy_4 1 = Debug|Teensy_4 1
+		Release|Arduino_Mega_or_Mega_2560 = Release|Arduino_Mega_or_Mega_2560
+		Release|Teensy_4 1 = Release|Teensy_4 1
+		Debug|Raspberry_Pi_Pico = Debug|Raspberry_Pi_Pico
+		Release|Raspberry_Pi_Pico = Release|Raspberry_Pi_Pico
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Arduino_Mega_or_Mega_2560
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Arduino_Mega_or_Mega_2560
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Arduino_Mega_or_Mega_2560
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Arduino_Mega_or_Mega_2560
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Debug|Teensy_4 1.ActiveCfg = Debug|Teensy_4 1
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Debug|Teensy_4 1.Build.0 = Debug|Teensy_4 1
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Teensy_4 1.ActiveCfg = Release|Teensy_4 1
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Teensy_4 1.Build.0 = Release|Teensy_4 1
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Raspberry_Pi_Pico
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
+		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {82BC2454-2B4C-4A0F-B2A9-834008977600}
+	EndGlobalSection
+EndGlobal

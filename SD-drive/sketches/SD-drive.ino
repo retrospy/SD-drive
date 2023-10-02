@@ -129,12 +129,30 @@ static unsigned long nextPoll;
 
 // The pins used on the newer SD Shields.
 
+#if defined(ARDUINO_AVR_MEGA2560)
 #define NEW_SHIELD_PIN  38
 #define OPTION_1_PIN    42
 #define OPTION_2_PIN    41
 #define OPTION_3_PIN    40
 #define OPTION_4_PIN    39
 #define TIMER_OUT_PIN   43    //maps to pin 18, CB1
+#elif defined(ARDUINO_TEENSY41)
+#define NEW_SHIELD_PIN  14
+#define OPTION_1_PIN    15
+#define OPTION_2_PIN    16
+#define OPTION_3_PIN    17
+#define OPTION_4_PIN    20
+#define TIMER_OUT_PIN   21    //maps to pin 18, CB1
+#elif defined(ARDUINO_RASPBERRY_PI_PICO)
+#define NEW_SHIELD_PIN  XX
+#define OPTION_1_PIN    14
+#define OPTION_2_PIN    15
+#define OPTION_3_PIN    9
+#define OPTION_4_PIN    10
+#define TIMER_OUT_PIN   22    //maps to pin 18, CB1
+#endif
+
+
 
 
 // Counters used for the timer.
@@ -151,6 +169,11 @@ void setup()
 {
         Serial.begin(9600);
 
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
+	    Wire.setSCL(21);
+	    Wire.setSDA(20);
+#endif
+	
         Serial.println("");
         Serial.println("SD Drive version 1.4");
         Serial.println("Brought to you by Bob Applegate and Corsham Technologies");
@@ -164,7 +187,10 @@ void setup()
         pinMode(SD_PIN, OUTPUT);    // required by SD library
 
         // Configure the new option pins as inputs with pull-ups
-        pinMode(NEW_SHIELD_PIN, INPUT_PULLUP);
+        
+#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_TEENSY41)
+	    pinMode(NEW_SHIELD_PIN, INPUT_PULLUP);
+#endif
         pinMode(OPTION_1_PIN, INPUT_PULLUP);
         pinMode(OPTION_2_PIN, INPUT_PULLUP);
         pinMode(OPTION_3_PIN, INPUT_PULLUP);
@@ -226,6 +252,7 @@ void setup()
 // Displays the amount of free memory to the serial port.  Useful for debugging
 // but will be removed eventually.
 
+#if defined(ARDUINO_AVR_MEGA2560)
 int freeRam(const char *text)
 {
         extern int __heap_start, *__brkval;
@@ -235,7 +262,54 @@ int freeRam(const char *text)
         Serial.print(" - Free memory: ");
         Serial.println(freemem);
 }
+#elif defined(ARDUINO_TEENSY41)
+int freeRam(const char *text) 
+{
+	// for Teensy 3.0
+	uint32_t stackTop;
+	uint32_t heapTop;
 
+	// current position of the stack.
+	stackTop = (uint32_t) &stackTop;
+
+	// current position of heap.
+	void* hTop = malloc(1);
+	heapTop = (uint32_t) hTop;
+	free(hTop);
+
+	// The difference is (approximately) the free, available ram.
+	int freemem = stackTop - heapTop;
+	
+	Serial.print(text);
+	Serial.print(" - Free memory: ");
+	Serial.println(freemem);
+}
+#elif defined(ARDUINO_RASPBERRY_PI_PICO)
+uint32_t getTotalHeap(void) {
+	extern char __StackLimit, __bss_end__;
+   
+	return &__StackLimit  - &__bss_end__;
+}
+
+uint32_t getFreeHeap(void) {
+	struct mallinfo m = mallinfo();
+
+	return getTotalHeap() - m.uordblks;
+}
+
+int freeRam(const char *text) 
+{
+	// The difference is (approximately) the free, available ram.
+	int freemem = getFreeHeap();
+	
+	Serial.print(text);
+	Serial.print(" - Free memory: ");
+	Serial.println(freemem);
+	
+	return freemem;
+}
+
+#endif
 
 
 //=============================================================================
@@ -875,8 +949,11 @@ bool isNewBoard(void)
 {
         // This pin is pulled high for the older boards but is pulled low
         // for new boards.
-        
+#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_TEENSY41)
         return !debounceInputPin(NEW_SHIELD_PIN);
+#elif defined(ARDUINO_RASPBERRY_PI_PICO)
+	    return true;
+#endif
 }
 
 

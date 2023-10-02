@@ -24,9 +24,20 @@
 
 // Define the pins used for the LEDs
 
+#if defined(ARDUINO_AVR_MEGA2560)
 #define RED_LED_PIN  24
 #define YELLOW_LED_PIN  23
 #define GREEN_LED_PIN  22
+#elif defined(ARDUINO_TEENSY41)
+#define RED_LED_PIN  24
+#define YELLOW_LED_PIN  23
+#define GREEN_LED_PIN  22
+#elif defined(ARDUINO_RASPBERRY_PI_PICO)
+#define RED_LED_PIN  26
+#define YELLOW_LED_PIN  27
+#define GREEN_LED_PIN  28
+#endif
+
 
 
 // Trying to remember if HIGH or LOW turns the LEDs on or off, so these
