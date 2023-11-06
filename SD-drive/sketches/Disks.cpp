@@ -89,7 +89,9 @@ void Disks::poll(void)
 
                         //tell all disks to close/unmount
                         closeAll();
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
     	                SD.end();
+#endif
                 }
                 else
                 {
