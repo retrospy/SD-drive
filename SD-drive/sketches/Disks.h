@@ -23,10 +23,8 @@
 
 #if defined(ARDUINO_AVR_MEGA2560)
 #define SD_PIN  53
-#elif defined(ARDUINO_TEENSY41)
-#define SD_PIN  0
 #elif defined(ARDUINO_RASPBERRY_PI_PICO)
-#define SD_PIN  17
+#define SD_PIN 17
 #endif
 
 // Reading the config file involves a very simple state machine.

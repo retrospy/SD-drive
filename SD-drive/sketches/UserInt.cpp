@@ -28,10 +28,6 @@
 #define RED_LED_PIN  24
 #define YELLOW_LED_PIN  23
 #define GREEN_LED_PIN  22
-#elif defined(ARDUINO_TEENSY41)
-#define RED_LED_PIN  24
-#define YELLOW_LED_PIN  23
-#define GREEN_LED_PIN  22
 #elif defined(ARDUINO_RASPBERRY_PI_PICO)
 #define RED_LED_PIN  26
 #define YELLOW_LED_PIN  27

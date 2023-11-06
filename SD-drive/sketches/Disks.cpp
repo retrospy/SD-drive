@@ -20,8 +20,13 @@
 extern bool debounceInputPin(int pin);
 
 // Pin with the presence sensor
-
+#if defined(ARDUINO_AVR_MEGA2560)
 #define PRESENCE_PIN 19
+#elif defined(ARDUINO_RASPBERRY_PI_PICO)
+#define PRESENCE_PIN  8
+#endif
+
+
 
 
 //=============================================================================
@@ -84,13 +89,14 @@ void Disks::poll(void)
 
                         //tell all disks to close/unmount
                         closeAll();
+    	                SD.end();
                 }
                 else
                 {
                         Serial.println("Disks::poll detected card insertion");
                         userInt->sendEvent(UI_SD_INSERTED);
                         SD.begin(SD_PIN);
-
+	                
                         //Mount all default drives
                         mountDefaults(whichConfigFile);
                 }

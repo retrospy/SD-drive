@@ -81,15 +81,6 @@ extern bool debounceInputPin(int pin);
 #define DIRECTION 47
 #define STROBE 48
 #define ACK 49
-#elif defined(ARDUINO_TEENSY41)
-#define LOWER_WRITE(val) GPIO7_DR = ((val & 0xF) | ((val & 0x30) << 6) | ((val & 0xC0) << 10))
-#define LOWER_READ(val) int temp = GPIO7_PSR; val = ((temp & 0x0F) | ((temp & 0xC00) >> 6) | ((temp & 0x30000) >> 10))
-#define LOWER_DDR(val) GPIO6_GDIR = val
-#define LOWER_MASK  0xff
-
-#define DIRECTION 2
-#define STROBE 3
-#define ACK 4
 #elif defined(ARDUINO_RASPBERRY_PI_PICO)
 #define LOWER_WRITE(val) gpio_put_masked(0x000000FF, val)
 #define LOWER_READ(val) val = (gpio_get_all() & 0x000000FF)
@@ -196,7 +187,7 @@ bool Link::poll(void)
                 // then send it to the state machine for processing.
                 
                 data = readByte();
-                
+	        
                 //Serial.print("Got byte: ");
                 //Serial.println((byte)data, HEX);
 
@@ -286,7 +277,7 @@ byte Link::readByte(void)
                 ;
                 
         // Data is available, so grab it right away, then ACK it.
-                
+    
         LOWER_READ(data);
         digitalWrite(ACK, HIGH);
                 

@@ -4,11 +4,12 @@
 
 /.vs
 /SD-drive/.visualgdb
-/SD-drive/.vs/SD-drive/FileContentIndex
 /SD-drive/Output/Arduino_Mega_or_Mega_2560/Debug
-/SD-drive/.vs/SD-drive/v17
+/SD-drive/.vs
 /SD-drive/Output/Arduino_Mega_or_Mega_2560/Release
 /.visualgdb
 /SD-drive/Output
-/SD-Drive-Test/.visualgdb/VisualGDBCache/SD-Drive-Test-Release-Raspberry_Pi_Pico
+/SD-Drive-Test/.visualgdb
 /SD-Drive-Test/Output/Raspberry_Pi_Pico/Release
+/SD-Drive-Test/Output/Raspberry_Pi_Pico/Debug
+/SD-Drive-Test/.vs

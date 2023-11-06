@@ -65,6 +65,9 @@
 // Revision 1.4:
 //    * Fixed bug that caused all DSK file updates to be appended rather than applied
 //      to the requested sector.  Removed a bit of excess debugging output.
+//
+// Revision 1.5:
+//    * Ported to Raspberry Pi Pico
 
 #include <Arduino.h>
 
@@ -136,13 +139,6 @@ static unsigned long nextPoll;
 #define OPTION_3_PIN    40
 #define OPTION_4_PIN    39
 #define TIMER_OUT_PIN   43    //maps to pin 18, CB1
-#elif defined(ARDUINO_TEENSY41)
-#define NEW_SHIELD_PIN  14
-#define OPTION_1_PIN    15
-#define OPTION_2_PIN    16
-#define OPTION_3_PIN    17
-#define OPTION_4_PIN    20
-#define TIMER_OUT_PIN   21    //maps to pin 18, CB1
 #elif defined(ARDUINO_RASPBERRY_PI_PICO)
 #define NEW_SHIELD_PIN  XX
 #define OPTION_1_PIN    14
@@ -169,15 +165,19 @@ void setup()
 {
         Serial.begin(9600);
 
+	    //while (!Serial);
+	
 #if defined(ARDUINO_RASPBERRY_PI_PICO)
 	    Wire.setSCL(21);
 	    Wire.setSDA(20);
 #endif
 	
         Serial.println("");
-        Serial.println("SD Drive version 1.4");
+        Serial.println("SD Drive version 1.5");
         Serial.println("Brought to you by Bob Applegate and Corsham Technologies");
         Serial.println("bob@corshamtech.com, www.corshamtech.com");
+	    Serial.println("Updated by Christopher 'Zoggins' Mallery and RetroSpy Technologies");
+	    Serial.println("zoggins@retro-spy.com, retro-spy.com");
         
         // Start up the UI soon so it can display some initial info
         // while the rest of the system comes up.
@@ -188,7 +188,7 @@ void setup()
 
         // Configure the new option pins as inputs with pull-ups
         
-#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_TEENSY41)
+#if defined(ARDUINO_AVR_MEGA2560)
 	    pinMode(NEW_SHIELD_PIN, INPUT_PULLUP);
 #endif
         pinMode(OPTION_1_PIN, INPUT_PULLUP);
@@ -244,6 +244,7 @@ void setup()
         pollCounter = 0;
 
         freeRam("Initialization complete");
+	
 }
 
 
@@ -261,28 +262,6 @@ int freeRam(const char *text)
         Serial.print(text);
         Serial.print(" - Free memory: ");
         Serial.println(freemem);
-}
-#elif defined(ARDUINO_TEENSY41)
-int freeRam(const char *text) 
-{
-	// for Teensy 3.0
-	uint32_t stackTop;
-	uint32_t heapTop;
-
-	// current position of the stack.
-	stackTop = (uint32_t) &stackTop;
-
-	// current position of heap.
-	void* hTop = malloc(1);
-	heapTop = (uint32_t) hTop;
-	free(hTop);
-
-	// The difference is (approximately) the free, available ram.
-	int freemem = stackTop - heapTop;
-	
-	Serial.print(text);
-	Serial.print(" - Free memory: ");
-	Serial.println(freemem);
 }
 #elif defined(ARDUINO_RASPBERRY_PI_PICO)
 uint32_t getTotalHeap(void) {
@@ -949,7 +928,7 @@ bool isNewBoard(void)
 {
         // This pin is pulled high for the older boards but is pulled low
         // for new boards.
-#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_TEENSY41)
+#if defined(ARDUINO_AVR_MEGA2560)
         return !debounceInputPin(NEW_SHIELD_PIN);
 #elif defined(ARDUINO_RASPBERRY_PI_PICO)
 	    return true;
