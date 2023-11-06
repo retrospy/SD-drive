@@ -7,27 +7,18 @@
     </CustomSourceDirectories>
     <AutoProgramSPIFFSPartition>true</AutoProgramSPIFFSPartition>
     <ProjectModeSettings>
-      <ProjectGUID>a8b34a44-6306-4362-8652-c3d33b28f226</ProjectGUID>
+      <ProjectGUID>bfbd6d47-1745-4b7c-b3b1-47d62ccd4fc2</ProjectGUID>
       <GroupSourcesByTypes>true</GroupSourcesByTypes>
       <GroupSourcesByPaths>true</GroupSourcesByPaths>
       <SketchSubdirectory>sketches</SketchSubdirectory>
-      <MainSketchFile>Disk.cpp</MainSketchFile>
+      <MainSketchFile>IO-Test-Server.ino</MainSketchFile>
       <RootSketchFolder>
         <Subfolders />
         <Files>
-          <string>SD-drive.ino</string>
+          <string>IO-Test-Server.ino</string>
         </Files>
       </RootSketchFolder>
-      <OtherFiles>
-        <string>sketches\Disk.h</string>
-        <string>sketches\Disks.h</string>
-        <string>sketches\Errors.h</string>
-        <string>sketches\Event.h</string>
-        <string>sketches\link.h</string>
-        <string>sketches\RTC.h</string>
-        <string>sketches\SdFuncs.h</string>
-        <string>sketches\UserInt.h</string>
-      </OtherFiles>
+      <OtherFiles />
     </ProjectModeSettings>
   </Project>
   <Build xsi:type="com.visualgdb.build.external.arduino">
@@ -50,14 +41,6 @@
     <PostDebugActions />
     <DebugStopActions />
     <BreakMode>Default</BreakMode>
-    <CustomBreakCommand>
-      <SkipWhenRunningCommandList>false</SkipWhenRunningCommandList>
-      <RemoteHost>
-        <HostName>BuildMachine</HostName>
-        <Transport>BuiltinShortcut</Transport>
-      </RemoteHost>
-      <BackgroundMode xsi:nil="true" />
-    </CustomBreakCommand>
   </CustomDebug>
   <CustomShortcuts>
     <Shortcuts />
@@ -79,7 +62,7 @@
   </CodeSense>
   <Configurations>
     <VisualGDBConfiguration>
-      <PlatformName>Arduino_Mega_or_Mega_2560</PlatformName>
+      <PlatformName>Arduino_Nano</PlatformName>
       <DebugSettingsOverride xsi:type="com.visualgdb.debug.embedded">
         <AdditionalStartupCommands />
         <AdditionalGDBSettings>
@@ -138,13 +121,13 @@
         <CheckInterfaceDrivers>true</CheckInterfaceDrivers>
       </DebugSettingsOverride>
       <BuildSettingsExtension xsi:type="com.visualgdb.build.external.arduino.extension">
-        <BoardID>arduino:avr:mega</BoardID>
+        <BoardID>arduino:avr:nano</BoardID>
         <COMPort />
         <Properties>
           <Entries>
             <KeyValue>
               <Key>cpu</Key>
-              <Value>atmega2560</Value>
+              <Value>atmega328</Value>
             </KeyValue>
           </Entries>
         </Properties>
@@ -207,7 +190,6 @@
       </DebugSettingsOverride>
       <BuildSettingsExtension xsi:type="com.visualgdb.build.external.arduino.extension">
         <BoardID>rp2040:rp2040:rpipico</BoardID>
-        <COMPort>COM19</COMPort>
         <Properties>
           <Entries>
             <KeyValue>

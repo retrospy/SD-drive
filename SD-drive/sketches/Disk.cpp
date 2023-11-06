@@ -169,7 +169,8 @@ bool Disk::read(unsigned long offset, byte *buf)
 		// should set an error code
 		return false;
 	}
-#endif	
+#endif
+	
         file.seek(offset);
         
         if ((file.available() < SECTOR_SIZE) || (offset + SECTOR_SIZE > file.size()))

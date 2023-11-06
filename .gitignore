@@ -13,3 +13,8 @@
 /SD-Drive-Test/Output/Raspberry_Pi_Pico/Release
 /SD-Drive-Test/Output/Raspberry_Pi_Pico/Debug
 /SD-Drive-Test/.vs
+/IO-Test-Client/.visualgdb/VisualGDBCache
+/IO-Test-Client/Output
+/IO-Test-Server/.visualgdb/VisualGDBCache
+/IO-Test-Server/Output
+/IO-Test-Server/Output/Arduino_Nano/Release/core/abi.cpp.d
