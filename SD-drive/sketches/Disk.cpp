@@ -94,7 +94,9 @@ void Disk::mount(char *afilename, bool readOnly)
                 }
                 else
                 {
-                        openFlag = O_RDWR;
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
+                        openFlag = FILE_WRITE;
+#else	                    openFlag = O_RDWR;#endif
                 }
 
                 // Open the file!
