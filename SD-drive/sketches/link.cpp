@@ -90,6 +90,8 @@ extern bool debounceInputPin(int pin);
 #define DIRECTION 11
 #define STROBE 12
 #define ACK 13
+
+#define DIR_245 10
 #endif
 
 
@@ -140,7 +142,7 @@ void Link::begin(void)
         pinMode(DIRECTION, INPUT);
         pinMode(STROBE, INPUT);
         pinMode(ACK, OUTPUT);
-        
+	    pinMode(DIR_245, OUTPUT);
         // The slave always starts in READ mode...
         
         prepareRead();
@@ -208,6 +210,9 @@ bool Link::poll(void)
 
 void Link::prepareRead(void)
 {
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
+	    digitalWriteFast(DIR_245, LOW);
+#endif
         LOWER_DDR((~LOWER_MASK) & 0xff);
 }
 
@@ -227,7 +232,10 @@ void Link::prepareWrite(void)
         
         while (debounceInputPin(DIRECTION))
                 ;
-
+#if defined(ARDUINO_RASPBERRY_PI_PICO)
+	digitalWriteFast(DIR_245, HIGH);
+#endif
+	
         LOWER_DDR(LOWER_MASK);
 }
 

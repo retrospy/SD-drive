@@ -1,3 +1,4 @@
+#line 1 "E:\\src\\Repos\\retrospy\\SD-drive\\SD-Drive-Test\\sketches\\SD-Drive-Test.ino"
 //=============================================================================
 // SD Shield Tester
 //
@@ -263,10 +264,8 @@ void doShowOptionSwitches(void)
 	Serial.print("Option 3: ");
 	Serial.println(digitalRead(OPTION_3_PIN) ? "Off" : "On");
 
-#if defined(ARDUINO_AVR_MEGA2560)
 	Serial.print("Option 4: ");
 	Serial.println(digitalRead(OPTION_4_PIN) ? "Off" : "On");
-#endif
 }
 
 

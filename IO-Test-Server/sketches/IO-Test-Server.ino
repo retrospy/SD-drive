@@ -1,17 +1,3 @@
-
-#if defined(ARDUINO_RASPBERRY_PI_PICO)
-#define IO0 0
-#define IO1 1
-#define IO2 2
-#define IO3 3
-#define IO4 4
-#define IO5 5
-#define IO6 6
-#define IO7 7
-#define DIRECTION 11
-#define STROBE 12
-#define ACK 13
-#else
 #define IO0 2
 #define IO1 3
 #define IO2 4
@@ -23,7 +9,6 @@
 #define DIRECTION 10
 #define STROBE 11
 #define ACK 12
-#endif
 
 void setup()
 {
