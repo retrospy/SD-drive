@@ -142,7 +142,9 @@ void Link::begin(void)
         pinMode(DIRECTION, INPUT);
         pinMode(STROBE, INPUT);
         pinMode(ACK, OUTPUT);
+#if defined(ARDUINO_RASPBERRY_PI_PICO)	
 	    pinMode(DIR_245, OUTPUT);
+#endif
         // The slave always starts in READ mode...
         
         prepareRead();

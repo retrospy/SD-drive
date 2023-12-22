@@ -29,7 +29,6 @@ Global
 		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
 		{A8B34A44-6306-4362-8652-C3D33B28F226}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Raspberry_Pi_Pico
-		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Raspberry_Pi_Pico
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Raspberry_Pi_Pico
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Arduino_Mega_or_Mega_2560
@@ -37,7 +36,6 @@ Global
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
 		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Arduino_Nano
 		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Arduino_Nano
 		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Arduino_Nano
 		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Arduino_Nano
@@ -45,7 +43,6 @@ Global
 		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Arduino_Nano
 		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Raspberry_Pi_Pico.Build.0 = Release|Arduino_Nano
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Arduino_Mega_or_Mega_2560
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Arduino_Mega_or_Mega_2560
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Raspberry_Pi_Pico
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Arduino_Mega_or_Mega_2560
