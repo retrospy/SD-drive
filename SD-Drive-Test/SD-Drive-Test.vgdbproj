@@ -122,7 +122,7 @@
       </DebugSettingsOverride>
       <BuildSettingsExtension xsi:type="com.visualgdb.build.external.arduino.extension">
         <BoardID>rp2040:rp2040:rpipico</BoardID>
-        <COMPort>COM19</COMPort>
+        <COMPort />
         <Properties>
           <Entries>
             <KeyValue>

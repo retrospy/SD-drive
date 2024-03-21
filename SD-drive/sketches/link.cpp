@@ -213,9 +213,8 @@ bool Link::poll(void)
 void Link::prepareRead(void)
 {
 #if defined(ARDUINO_RASPBERRY_PI_PICO)
-	    digitalWriteFast(DIR_245, LOW);
-#endif
-        LOWER_DDR((~LOWER_MASK) & 0xff);
+	digitalWriteFast(DIR_245, LOW);
+#endif	LOWER_DDR((~LOWER_MASK) & 0xff);
 }
 
 
@@ -236,9 +235,11 @@ void Link::prepareWrite(void)
                 ;
 #if defined(ARDUINO_RASPBERRY_PI_PICO)
 	digitalWriteFast(DIR_245, HIGH);
+	for (int i = 0; i < 8; ++i)
+		pinMode(i, OUTPUT);
+#else
+    LOWER_DDR(LOWER_MASK);  // This doesn't work on the Pico for some reason.
 #endif
-	
-        LOWER_DDR(LOWER_MASK);
 }
 
 
