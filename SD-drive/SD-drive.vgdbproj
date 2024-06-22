@@ -115,6 +115,7 @@
           <MaxBreakpointLimit>0</MaxBreakpointLimit>
           <EnableVerboseMode>true</EnableVerboseMode>
           <EnablePrettyPrinters>false</EnablePrettyPrinters>
+          <EnableAbsolutePathReporting>true</EnableAbsolutePathReporting>
         </AdditionalGDBSettings>
         <DebugMethod>
           <ID>gdbsim</ID>
@@ -188,6 +189,7 @@
           <MaxBreakpointLimit>0</MaxBreakpointLimit>
           <EnableVerboseMode>true</EnableVerboseMode>
           <EnablePrettyPrinters>false</EnablePrettyPrinters>
+          <EnableAbsolutePathReporting>true</EnableAbsolutePathReporting>
         </AdditionalGDBSettings>
         <DebugMethod />
         <AutoDetectRTOS>true</AutoDetectRTOS>
