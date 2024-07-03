@@ -55,11 +55,12 @@
 
 #include "link.h"
 #include <Arduino.h>
+#include "output.h"
 
 // Various debug options.  These should all be left as undefined or
 // else performance will suffer.
 
-#undef DEBUG_LINK_RAW
+//#undef DEBUG_LINK_RAW
 
 extern unsigned getSectorSize(byte code);
 
@@ -134,26 +135,18 @@ Link::Link(void)
 
 void Link::begin(void)
 {
-        hasEvent = false;
+	
+    hasEvent = false;
+	
+	uint offset = pio_add_program(pio0, &parallel_io_program);
+	parallel_output_program_init(pio0, 0, offset);
         
-        // Set the ACK to output, DIRECTION and STROBE to input
+    Serial.println("LINK is initialized");
+
+	
+    // Make sure we've got an event
         
-        digitalWrite(ACK, LOW);
-        pinMode(DIRECTION, INPUT);
-        pinMode(STROBE, INPUT);
-        pinMode(ACK, OUTPUT);
-#if defined(ARDUINO_RASPBERRY_PI_PICO)	
-	    pinMode(DIR_245, OUTPUT);
-#endif
-        // The slave always starts in READ mode...
-        
-        prepareRead();
-        
-        Serial.println("LINK is initialized");
-        
-        // Make sure we've got an event
-        
-        freeEvent = new Event();
+    freeEvent = new Event();
 }
 
 
@@ -178,22 +171,22 @@ Link::~Link(void)
 
 bool Link::poll(void)
 {
-        word data;
+        int data;
   
         // Strobe goes high if the host has put data on the data pins.  Something
         // to consider for a future fix is a timeout here.  If the STROBE line is
         // floating then the code might get stuck here forever waiting for a byte
         // to arrive.
         
-        if (debounceInputPin(STROBE))
+        if (parallel_io_has_data(pio0, 0))
         {
                 // There is a strobe, so get the byte from the host and
                 // then send it to the state machine for processing.
                 
                 data = readByte();
 	        
-                //Serial.print("Got byte: ");
-                //Serial.println((byte)data, HEX);
+                Serial.print("Got byte from FIFO: ");
+                Serial.println(data, HEX);
 
                 // Let the state machine process the byte of data.
                 
@@ -212,9 +205,9 @@ bool Link::poll(void)
 
 void Link::prepareRead(void)
 {
-#if defined(ARDUINO_RASPBERRY_PI_PICO)
-	digitalWriteFast(DIR_245, LOW);
-#endif	LOWER_DDR((~LOWER_MASK) & 0xff);
+//#if defined(ARDUINO_RASPBERRY_PI_PICO)
+//	digitalWriteFast(DIR_245, LOW);
+//#endif//	LOWER_DDR((~LOWER_MASK) & 0xff);
 }
 
 
@@ -231,15 +224,15 @@ void Link::prepareWrite(void)
         // side has indicating it's in read mode or else we might have
         // both drivers fighting each other.
         
-        while (debounceInputPin(DIRECTION))
-                ;
-#if defined(ARDUINO_RASPBERRY_PI_PICO)
-	digitalWriteFast(DIR_245, HIGH);
-	for (int i = 0; i < 8; ++i)
-		pinMode(i, OUTPUT);
-#else
-    LOWER_DDR(LOWER_MASK);  // This doesn't work on the Pico for some reason.
-#endif
+//        while (debounceInputPin(DIRECTION))
+//                ;
+//#if defined(ARDUINO_RASPBERRY_PI_PICO)
+//	digitalWriteFast(DIR_245, HIGH);
+//	for (int i = 0; i < 8; ++i)
+//		pinMode(i, OUTPUT);
+//#else
+//    LOWER_DDR(LOWER_MASK);  // This doesn't work on the Pico for some reason.
+//#endif
 }
 
 
@@ -251,25 +244,30 @@ void Link::prepareWrite(void)
 
 void Link::writeByte(byte data)
 {
-#ifdef DEBUG_LINK_RAW
-        Serial.print("Link writeByte: ");
-        Serial.println(data, HEX);
-#endif  // DEBUG_LINK_RAW
-
-        // Put the byte onto the data port
-        
-        LOWER_WRITE(data);
-                
-        // raise ACK to indicate data is present, then wait for
-        // strobe to go high
-                
-        digitalWrite(ACK, HIGH);
-        while (debounceInputPin(STROBE) == LOW)
-                ;
-                    
-        digitalWrite(ACK, LOW);
-        while (debounceInputPin(STROBE) == HIGH);
-                ;
+//#ifdef DEBUG_LINK_RAW
+//        Serial.print("Link writeByte: ");
+//        Serial.println(data, HEX);
+//#endif  // DEBUG_LINK_RAW
+//
+//        // Put the byte onto the data port
+//        
+//        LOWER_WRITE(data);
+//                
+//        // raise ACK to indicate data is present, then wait for
+//        // strobe to go high
+//                
+//        digitalWrite(ACK, HIGH);
+//        while (debounceInputPin(STROBE) == LOW)
+//                ;
+//                    
+//        digitalWrite(ACK, LOW);
+//        while (debounceInputPin(STROBE) == HIGH);
+//                ;
+	Serial.print("Pushing '");
+	Serial.print(data, HEX);
+	Serial.println("' onto FIFO");
+	
+	parallel_io_putc(pio0, 0, data);
 }
 
 
@@ -280,31 +278,36 @@ void Link::writeByte(byte data)
 
 byte Link::readByte(void)
 {
-        byte data;
+	int data = parallel_io_getc(pio0, 0);
         
-        // Wait for STROBE to go high, indicating a byte is ready.
-        
-        while (debounceInputPin(STROBE) == LOW)
-                ;
-                
-        // Data is available, so grab it right away, then ACK it.
-    
-        LOWER_READ(data);
-        digitalWrite(ACK, HIGH);
-                
-        // Wait for host to lower strobe
-                
-        while (debounceInputPin(STROBE))
-                ;
-                        
-        // Lower ACK and we're done.
-                
-        digitalWrite(ACK, LOW);
-
+	
 #ifdef DEBUG_LINK_RAW
         Serial.print("Link readByte: ");
         Serial.println(data, HEX);
 #endif  // DEBUG_LINK_RAW
+//        // Wait for STROBE to go high, indicating a byte is ready.
+//        
+//        while (debounceInputPin(STROBE) == LOW)
+//                ;
+//                
+//        // Data is available, so grab it right away, then ACK it.
+//    
+//        LOWER_READ(data);
+//        digitalWrite(ACK, HIGH);
+//                
+//        // Wait for host to lower strobe
+//                
+//        while (debounceInputPin(STROBE))
+//                ;
+//                        
+//        // Lower ACK and we're done.
+//                
+//        digitalWrite(ACK, LOW);
+//
+//#ifdef DEBUG_LINK_RAW
+//        Serial.print("Link readByte: ");
+//        Serial.println(data, HEX);
+//#endif  // DEBUG_LINK_RAW
 
         return data;
 }

@@ -27,6 +27,8 @@
         <string>sketches\RTC.h</string>
         <string>sketches\SdFuncs.h</string>
         <string>sketches\UserInt.h</string>
+        <string>sketches\output.pio</string>
+        <string>sketches\output.h</string>
       </OtherFiles>
     </ProjectModeSettings>
   </Project>

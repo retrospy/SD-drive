@@ -86,7 +86,8 @@
 #include "RTC.h"
 #include "Errors.h"
 #include "SdFuncs.h"
-
+#include "output.h"
+#include "hardware/pio.h"
 
 // Debugging options.  They usually produce lots of serial output so be careful what you turn on.
 
@@ -191,6 +192,8 @@ void setup()
 	pinMode(OPTION_2_PIN, INPUT_PULLUP);
 	if (digitalRead(OPTION_2_PIN) == HIGH)
 	{
+	
+		
 		testerOn = false;
 		Serial.begin(9600);
 
