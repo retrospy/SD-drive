@@ -59,27 +59,22 @@ static inline pio_sm_config parallel_io_program_get_default_config(uint offset) 
 #include "hardware/clocks.h"
 #include "hardware/gpio.h"
 static inline void parallel_output_program_init(PIO pio, uint sm, uint offset) 
-{
-    pio_sm_set_pins_with_mask(pio, sm, 0x00, 1u << 10 | 1u << 13);
-    pio_sm_set_pindirs_with_mask(pio, sm, 0xFF, 1u << 10 | 1u << 13);
-    pio_sm_set_pindirs_with_mask(pio, sm, 0x00, 1u << 11 | 1u << 12 | 0xFF);
-    pio_gpio_init(pio, 10);
-    pio_gpio_init(pio, 13);
-    for(int i = 0; i < 8; ++i)
-        pio_gpio_init(pio, i);
-    pio_gpio_init(pio, 11);
-    pio_gpio_init(pio, 12);
+{    
     pio_sm_config c = parallel_io_program_get_default_config(offset);
-    sm_config_set_out_shift(&c, true, true, 8);
     // IO mapping
     sm_config_set_out_pins(&c, 0, 8);
     sm_config_set_in_pins(&c, 0);
     sm_config_set_set_pins(&c, 10, 1);
     sm_config_set_sideset_pins(&c, 13);
-    sm_config_set_sideset(&c, 1, true, false);
     sm_config_set_jmp_pin(&c, 12);
-    sm_config_set_clkdiv(&c, 10000000);
-    // Configure and start SM
+    pio_sm_set_pindirs_with_mask(pio, sm, 0xFF, 1u << 10 | 1u << 13);
+    pio_sm_set_pindirs_with_mask(pio, sm, 0x00, 1u << 11 | 1u << 12 | 0xFF);
+    pio_sm_set_pins_with_mask(pio, sm, 0x00, 1u << 13 | 1u << 10); 
+    for(int i = 0; i < 8; ++i)
+        pio_gpio_init(pio, i);
+    for(int i = 12; i < 14; ++i)
+        pio_gpio_init(pio, i);
+    sm_config_set_out_shift(&c, true, true, 8);
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
 }
