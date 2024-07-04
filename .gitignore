@@ -18,3 +18,9 @@
 /IO-Test-Server/.visualgdb/VisualGDBCache
 /IO-Test-Server/Output
 /IO-Test-Server/Output/Arduino_Nano/Release/core/abi.cpp.d
+/TestClient/.visualgdb/VisualGDBCache/TestClient-Release-Raspberry_Pi_Pico
+/TestClient/Output/Raspberry_Pi_Pico/Release
+/TestClient/Output/Raspberry_Pi_Pico/Release/core/api/Common.cpp.d
+/TestHost/.visualgdb/VisualGDBCache/TestHost-Release-Raspberry_Pi_Pico
+/TestHost/Output/Raspberry_Pi_Pico/Release
+/TestHost/Output/Raspberry_Pi_Pico/Release/core/api/Common.cpp.d
