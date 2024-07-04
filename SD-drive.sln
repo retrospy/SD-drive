@@ -12,6 +12,10 @@ Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "IO-Test-Client", "IO-Test-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IO-Test", "IO-Test", "{00CAA4ED-7686-4614-BAFB-271E7A73860D}"
 EndProject
+Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "TestHost", "TestHost\TestHost.vgdbproj", "{AC6D4351-7291-46E6-BD42-C5241582AEA7}"
+EndProject
+Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "TestClient", "TestClient\TestClient.vgdbproj", "{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Arduino_Mega_or_Mega_2560 = Debug|Arduino_Mega_or_Mega_2560
@@ -49,6 +53,22 @@ Global
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Arduino_Mega_or_Mega_2560
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
 		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
+		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
+		{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
