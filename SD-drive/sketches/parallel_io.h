@@ -13,39 +13,36 @@
 // ----------- //
 
 #define parallel_io_wrap_target 0
-#define parallel_io_wrap 21
+#define parallel_io_wrap 18
 
 static const uint16_t parallel_io_program_instructions[] = {
             //     .wrap_target
-    0xe000, //  0: set    pins, 0                    
-    0x00cf, //  1: jmp    pin, 15                    
-    0x00e4, //  2: jmp    !osre, 4                   
-    0x0015, //  3: jmp    21                         
-    0x200b, //  4: wait   0 gpio, 11                 
-    0xb842, //  5: nop                    side 1     
-    0x6088, //  6: out    pindirs, 8                 
-    0x6008, //  7: out    pins, 8                    
-    0x6008, //  8: out    pins, 8                    
-    0xe001, //  9: set    pins, 1                    
-    0x208c, // 10: wait   1 gpio, 12                 
-    0xe000, // 11: set    pins, 0                    
-    0x200c, // 12: wait   0 gpio, 12                 
-    0x6088, // 13: out    pindirs, 8                 
-    0x0015, // 14: jmp    21                         
-    0xb042, // 15: nop                    side 0     
-    0x4008, // 16: in     pins, 8                    
-    0x8020, // 17: push   block                      
-    0xe001, // 18: set    pins, 1                    
-    0x200c, // 19: wait   0 gpio, 12                 
-    0xe000, // 20: set    pins, 0                    
-    0xa042, // 21: nop                               
+    0x00cc, //  0: jmp    pin, 12                    
+    0x00e3, //  1: jmp    !osre, 3                   
+    0x0012, //  2: jmp    18                         
+    0x200b, //  3: wait   0 gpio, 11                 
+    0x7888, //  4: out    pindirs, 8      side 1     
+    0x6008, //  5: out    pins, 8                    
+    0xe001, //  6: set    pins, 1                    
+    0x208c, //  7: wait   1 gpio, 12                 
+    0xe000, //  8: set    pins, 0                    
+    0x200c, //  9: wait   0 gpio, 12                 
+    0x7088, // 10: out    pindirs, 8      side 0     
+    0x0012, // 11: jmp    18                         
+    0x208b, // 12: wait   1 gpio, 11                 
+    0x4008, // 13: in     pins, 8                    
+    0x8020, // 14: push   block                      
+    0xe001, // 15: set    pins, 1                    
+    0x200c, // 16: wait   0 gpio, 12                 
+    0xe000, // 17: set    pins, 0                    
+    0xa042, // 18: nop                               
             //     .wrap
 };
 
 #if !PICO_NO_HARDWARE
 static const struct pio_program parallel_io_program = {
     .instructions = parallel_io_program_instructions,
-    .length = 22,
+    .length = 19,
     .origin = -1,
 };
 
@@ -75,14 +72,14 @@ static inline void parallel_output_program_init(PIO pio, uint sm, uint offset)
     for(int i = 10; i < 14; ++i)
         pio_gpio_init(pio, i);
     sm_config_set_out_shift(&c, true, true, 24);
-    sm_config_set_in_shift(&c, false, true, 16);
+    sm_config_set_in_shift(&c, false, false, 8);
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
 }
-static inline void parallel_io_putc(PIO pio, uint sm, int c) {
-    pio_sm_put_blocking(pio, sm, (uint32_t)c);
+static inline void parallel_io_putc(PIO pio, uint sm, char c) {
+    pio_sm_put_blocking(pio, sm, c << 8 | 0xFF);
 }
-static inline int parallel_io_getc(PIO pio, uint sm) {
+static inline char parallel_io_getc(PIO pio, uint sm) {
     return pio_sm_get_blocking(pio, sm);
 }
 static inline bool parallel_io_has_data(PIO pio, uint sm)

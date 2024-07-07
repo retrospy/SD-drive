@@ -1,26 +1,23 @@
 .program parallel_io
 .side_set 1 opt
 
-    set pins 0 
     jmp pin, recv      // High means STROBE is HIGH and host is sending data
 	jmp !OSRE,send
     jmp exit
 
     send:
     wait 0 gpio 11          // Wait for DIRECTION to go LOW      	
-	nop side 1	            // Set 245_DIR HIGH
-    out pindirs, 8
-    out pins, 8             // Output data
+    out pindirs, 8 side 1   // Set pins for output
     out pins, 8             // Output data
     set pins 1              // Set ACK HIGH
 	wait 1 GPIO 12          // Wait for STROBE to go HIGH
     set pins 0              // Set ACK LOW
     wait 0 GPIO 12          // Wait for STROBE to go LOW
-    out pindirs, 8
+    out pindirs, 8 side 0   // Set pins back for input
     jmp exit 
 
     recv:
-    nop side 0          // Set 245_DIR HIGH LOW
+    wait 1 gpio 11      // Wait for DIRECTION to go HIGH 
     in pins 8           // Read data pins
     push
     set pins 1          // Set ACK HIGH
@@ -37,7 +34,6 @@
 
 static inline void parallel_output_program_init(PIO pio, uint sm, uint offset) 
 {    
-
     pio_sm_config c = parallel_io_program_get_default_config(offset);
 
     // IO mapping
@@ -57,17 +53,17 @@ static inline void parallel_output_program_init(PIO pio, uint sm, uint offset)
         pio_gpio_init(pio, i);
 
     sm_config_set_out_shift(&c, true, true, 24);
-    sm_config_set_in_shift(&c, false, true, 16);
+    sm_config_set_in_shift(&c, false, false, 8);
 
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
 }
 
-static inline void parallel_io_putc(PIO pio, uint sm, int c) {
-    pio_sm_put_blocking(pio, sm, (uint32_t)c);
+static inline void parallel_io_putc(PIO pio, uint sm, char c) {
+    pio_sm_put_blocking(pio, sm, c << 8 | 0xFF);
 }
 
-static inline int parallel_io_getc(PIO pio, uint sm) {
+static inline char parallel_io_getc(PIO pio, uint sm) {
 
     return pio_sm_get_blocking(pio, sm);
 }

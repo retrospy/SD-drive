@@ -19,8 +19,8 @@
         </Files>
       </RootSketchFolder>
       <OtherFiles>
-        <string>sketches\output.h</string>
-        <string>sketches\output.pio</string>
+        <string>sketches\parallel_io.pio</string>
+        <string>sketches\parallel_io.h</string>
       </OtherFiles>
     </ProjectModeSettings>
   </Project>
@@ -144,7 +144,7 @@
       </DebugSettingsOverride>
       <BuildSettingsExtension xsi:type="com.visualgdb.build.external.arduino.extension">
         <BoardID>rp2040:rp2040:rpipico</BoardID>
-        <COMPort>COM18</COMPort>
+        <COMPort>COM27</COMPort>
         <Properties>
           <Entries>
             <KeyValue>

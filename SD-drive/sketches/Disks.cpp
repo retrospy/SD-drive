@@ -75,8 +75,8 @@ void Disks::poll(void)
         // Get current state of the present bit
 
         bool state = debounceInputPin(PRESENCE_PIN);
-
-        if (state != presentState)
+	
+	if (state != presentState)
         {
                 // Finally, we can do the appropriate
                 // action based on whether the card is

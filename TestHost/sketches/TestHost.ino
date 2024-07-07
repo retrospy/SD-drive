@@ -2,16 +2,11 @@
 #define STROBE 11
 #define ACK 12
 
-//#define DIR_245 10
-
 void setup()
 {
 	pinMode(DIRECTION, OUTPUT);
 	pinMode(STROBE, OUTPUT);
-	//  pinMode(DIR_245, OUTPUT);
 	pinMode(ACK, INPUT);
-  
-	//  digitalWrite(DIR_245, HIGH);
   
 	for (int i = 2; i < 10; ++i)
 		pinMode(i, OUTPUT);
@@ -51,7 +46,7 @@ int i = 0;
 void loop()
 {
 	delay(1000);
-  
+
 	Serial.print("SETTTING DATA TO ");
 	Serial.println(i, HEX);
 	digitalWrite(2, (i & 0x01) == 0 ? LOW : HIGH);

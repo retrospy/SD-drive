@@ -86,7 +86,6 @@
 #include "RTC.h"
 #include "Errors.h"
 #include "SdFuncs.h"
-#include "output.h"
 #include "hardware/pio.h"
 
 // Debugging options.  They usually produce lots of serial output so be careful what you turn on.
@@ -111,7 +110,7 @@
 
 // Number of times an input pin must be the same before it is counted.
 
-#define DEBOUNCE_COUNT      5
+#define DEBOUNCE_COUNT      1
 
 // The link to the remote system.
 
@@ -192,8 +191,6 @@ void setup()
 	pinMode(OPTION_2_PIN, INPUT_PULLUP);
 	if (digitalRead(OPTION_2_PIN) == HIGH)
 	{
-	
-		
 		testerOn = false;
 		Serial.begin(9600);
 
@@ -260,7 +257,7 @@ void setup()
 		}
         
 		link = new Link();
-		link->begin();
+		link->begin(debounceInputPin(OPTION_3_PIN) ? true : false);
 
 		disks = new Disks();
 		disks->mountDefaults(WhichConfigFile);
@@ -389,7 +386,6 @@ void loop()
 		// Poll for any incoming commands.  If there is something to process,
 		// go ahead and handle it now.  There is no time delay here; check often
 		// and process incoming messages ASAP.
-        
 		if (link->poll())
 		{
 			Event *ep = link->getEvent(); // this waits for an event

@@ -24,3 +24,7 @@
 /TestHost/.visualgdb/VisualGDBCache/TestHost-Release-Raspberry_Pi_Pico
 /TestHost/Output/Raspberry_Pi_Pico/Release
 /TestHost/Output/Raspberry_Pi_Pico/Release/core/api/Common.cpp.d
+/TestClient/.visualgdb/VisualGDBCache/TestClient-Debug-Raspberry_Pi_Pico
+/TestClient/Output/Raspberry_Pi_Pico/Debug
+/TestHost/.visualgdb/VisualGDBCache/TestHost-Debug-Raspberry_Pi_Pico
+/TestHost/Output/Raspberry_Pi_Pico/Debug

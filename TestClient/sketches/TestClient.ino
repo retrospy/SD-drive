@@ -1,4 +1,4 @@
-#include "output.h"
+#include "parallel_io.h"
 
 #define DIRECTION 11
 #define STROBE 12
@@ -182,8 +182,8 @@ void loop()
 			Serial.println(data, HEX);
 			
 			Serial.print("Sent byte to host: ");
-			Serial.println(0x000000 | 0xFF | i << 8, HEX);
-			parallel_io_putc(pio0, 0, 0x00000000 | 0xFF | i << 8);				
+			Serial.println(i, HEX);
+			parallel_io_putc(pio0, 0, i << 8 | 0xFF);				
 	
 			i = (i - 1);
 			if (i < 0)

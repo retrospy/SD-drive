@@ -6,12 +6,6 @@ Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "SD-drive", "SD-drive\SD-dri
 EndProject
 Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "SD-Drive-Test", "SD-Drive-Test\SD-Drive-Test.vgdbproj", "{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}"
 EndProject
-Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "IO-Test-Server", "IO-Test-Server\IO-Test-Server.vgdbproj", "{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}"
-EndProject
-Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "IO-Test-Client", "IO-Test-Client\IO-Test-Client.vgdbproj", "{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IO-Test", "IO-Test", "{00CAA4ED-7686-4614-BAFB-271E7A73860D}"
-EndProject
 Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "TestHost", "TestHost\TestHost.vgdbproj", "{AC6D4351-7291-46E6-BD42-C5241582AEA7}"
 EndProject
 Project("{803FD0C6-D64E-4E16-9DC3-1DAEC859A3D2}") = "TestClient", "TestClient\TestClient.vgdbproj", "{E5D50FBF-B528-43C6-A234-8D4781AD4EF3}"
@@ -39,20 +33,6 @@ Global
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Arduino_Mega_or_Mega_2560
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
 		{7CF4C8D5-1264-40F0-825A-FAA8EACC7B6A}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Arduino_Nano
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2}.Release|Raspberry_Pi_Pico.Build.0 = Release|Arduino_Nano
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Arduino_Mega_or_Mega_2560
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Debug|Raspberry_Pi_Pico.Build.0 = Debug|Raspberry_Pi_Pico
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Arduino_Mega_or_Mega_2560.ActiveCfg = Release|Arduino_Mega_or_Mega_2560
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Arduino_Mega_or_Mega_2560.Build.0 = Release|Arduino_Mega_or_Mega_2560
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Raspberry_Pi_Pico.ActiveCfg = Release|Raspberry_Pi_Pico
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7}.Release|Raspberry_Pi_Pico.Build.0 = Release|Raspberry_Pi_Pico
 		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Arduino_Mega_or_Mega_2560.ActiveCfg = Debug|Raspberry_Pi_Pico
 		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Arduino_Mega_or_Mega_2560.Build.0 = Debug|Raspberry_Pi_Pico
 		{AC6D4351-7291-46E6-BD42-C5241582AEA7}.Debug|Raspberry_Pi_Pico.ActiveCfg = Debug|Raspberry_Pi_Pico
@@ -72,10 +52,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{BFBD6D47-1745-4B7C-B3B1-47D62CCD4FC2} = {00CAA4ED-7686-4614-BAFB-271E7A73860D}
-		{CDFD06BD-A1C3-49A9-B1E0-B47776544FC7} = {00CAA4ED-7686-4614-BAFB-271E7A73860D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82BC2454-2B4C-4A0F-B2A9-834008977600}

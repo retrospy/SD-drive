@@ -65,7 +65,7 @@ class Link
                 Link(void);
                 ~Link(void);
                 bool poll(void);
-                void begin(void);
+                void begin(bool _enablePIOMode);
                 void prepareRead(void);
                 void prepareWrite(void);
                 void writeByte(byte data);

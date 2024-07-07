@@ -27,8 +27,8 @@
         <string>sketches\RTC.h</string>
         <string>sketches\SdFuncs.h</string>
         <string>sketches\UserInt.h</string>
-        <string>sketches\output.pio</string>
-        <string>sketches\output.h</string>
+        <string>sketches\parallel_io.pio</string>
+        <string>sketches\parallel_io.h</string>
       </OtherFiles>
     </ProjectModeSettings>
   </Project>
@@ -220,11 +220,11 @@
             </KeyValue>
             <KeyValue>
               <Key>freq</Key>
-              <Value>133</Value>
+              <Value>250</Value>
             </KeyValue>
             <KeyValue>
               <Key>opt</Key>
-              <Value>Small</Value>
+              <Value>Optimize3</Value>
             </KeyValue>
             <KeyValue>
               <Key>rtti</Key>
@@ -260,7 +260,7 @@
             </KeyValue>
           </Entries>
         </Properties>
-        <DebugUnoptimizedComponentTypes>Sketch</DebugUnoptimizedComponentTypes>
+        <DebugUnoptimizedComponentTypes>None</DebugUnoptimizedComponentTypes>
       </BuildSettingsExtension>
     </VisualGDBConfiguration>
   </Configurations>
