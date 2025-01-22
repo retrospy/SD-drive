@@ -10,6 +10,8 @@
 // Standard error return values
 
 #define ERR_NONE                0    // No error
+#define ERR_FEATURE_DISABLED    8
+#define ERR_FILE_EXISTS         9
 #define ERR_NOT_MOUNTED        10    // No drive mounted
 #define ERR_MOUNTED            11    // already mounted
 #define ERR_FILE_NOT_FOUND     12

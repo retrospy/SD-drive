@@ -296,7 +296,7 @@ bool Disk::write(unsigned long offset, byte *buf)
 //  4: 
 //  5: 
 //  6: 
-//  7: 
+//  7: 0 = drive valid, 1 == drive invalid
 //
 // Generally speaking, a value of 0 means no problems.
 

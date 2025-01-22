@@ -6,6 +6,9 @@
 //
 // Bob Applegate - K2UT, bob@corshamtech.com
 
+// 2025/01/14 - Eduardo Casino: Implement format(), add error checks
+//              erase(), rename(), copy(), fixes...
+
 #include <SD.h>
 #include "Disks.h"
 #include "Errors.h"
@@ -265,7 +268,7 @@ enum
 
 bool Disks::saveConfig(void)
 {
-        bool ret = false;
+        bool ret = true;
         File ofile;
         int state = STATE_NEWLINE;
         int d;
@@ -279,25 +282,10 @@ bool Disks::saveConfig(void)
         // the contents copied from one to the other.
 
         SD.remove(CONFIG_BACKUP_FILE);      // remove old backup
-        file = SD.open(configFileName, FILE_READ);
-        ofile = SD.open(CONFIG_BACKUP_FILE, FILE_WRITE);
-        if (!ofile || !file)
+        if (!internalRename(configFileName, CONFIG_BACKUP_FILE))
         {
-                Serial.print("Failed copying file");
-                file.close();
-                ofile.close();
                 return ret;
         }
-
-        while (file.available())
-        {
-          ofile.write(file.read());
-        }
-
-        ofile.close();
-        file.close();
-
-        SD.remove(configFileName);   // remove the existing config file
 
         // We now have a backup.
 
@@ -306,6 +294,7 @@ bool Disks::saveConfig(void)
         if (!ofile || !file)
         {
                 Serial.println("failed to open config file for updating");
+                ret = false;
         }
         else
         {
@@ -389,7 +378,7 @@ bool Disks::saveConfig(void)
 
 bool Disks::mount(byte drive, char *filename, bool readOnly)
 {
-        bool ret = false;    // assume no error
+        bool ret = true;    // assume no error
         
         Serial.print("Got mount request for drive ");
         Serial.print(drive);
@@ -400,15 +389,28 @@ bool Disks::mount(byte drive, char *filename, bool readOnly)
                 Serial.print(" - read only");
         Serial.println("");
         
-        disks[drive]->mount(filename, readOnly);
-        if (disks[drive]->isGood())
+        if (isDriveValid(drive))
         {
-                ret = true;
+                disks[drive]->mount(filename, readOnly);
+                if (!disks[drive]->isGood())
+                {
+                        ret = false;
+                        setError(disks[drive]->getError());    // move their error into our error code
+                }
+        }
+        else
+        {
+                ret = false;
+                setError(ERR_BAD_DRIVE);
+        }
+
+        if (ret)
+        {
+                setError(ERR_NONE);
                 Serial.println(" - SUCCESS!");
         }
         else
         {
-                setError(disks[drive]->getError());    // move their error into our error code
                 Serial.print(" - FAILED!  Error code ");
                 Serial.println(errorCode);
         }
@@ -420,15 +422,23 @@ bool Disks::mount(byte drive, char *filename, bool readOnly)
 
 
 //=============================================================================
-// Unmount just one drive, the number being passed in.  Returns true on error
-// false if not.
+// Unmount just one drive, the number being passed in.  Returns true on success
+// false on error
 
 bool Disks::unmount(byte drive)
 {
-        bool ret = false;    // assume no error
+        bool ret = true;    // assume no error
         
-        disks[drive]->unmount();
-        
+        if (isDriveValid(drive))
+        {
+                disks[drive]->unmount();
+                setError(ERR_NONE);
+        }
+        else
+        {
+                ret = false;
+                setError(ERR_BAD_DRIVE);
+        }
         return ret;
 }
 
@@ -444,25 +454,31 @@ bool Disks::read(byte drive, unsigned long offset, byte *buf)
 {
         bool ret = false;
         
-        // Is the drive even mounted?
-        
-        if (disks[drive]->isMounted())
+        if (isDriveValid(drive))
         {
-                if (disks[drive]->read(offset, buf))
+                // Is the drive even mounted?
+                if (disks[drive]->isMounted())
                 {
-                        ret = true;
-                        errorCode = ERR_NONE;
+                        if (disks[drive]->read(offset, buf))
+                        {
+                                ret = true;
+                                setError(ERR_NONE);
+                        }
+                        else    // error
+                        {
+                                Serial.println("**** read error ****");
+                                Serial.flush();
+                                setError(disks[drive]->getError());
+                        }
                 }
-                else    // error
+                else
                 {
-                        Serial.println("**** read error ****");
-                        Serial.flush();
-                        errorCode = disks[drive]->getError();
+                        setError(ERR_NOT_MOUNTED);
                 }
         }
         else
         {
-                errorCode = ERR_NOT_MOUNTED;
+                setError(ERR_BAD_DRIVE);
         }
 
         return ret;
@@ -480,24 +496,30 @@ bool Disks::write(byte drive, unsigned long offset, byte *buf)
 {
         bool ret = false;
         
-        // Is the drive even mounted?
-        
-        if (disks[drive]->isMounted())
+        if (isDriveValid(drive))
         {
-                if (disks[drive]->write(offset, buf))
+                // Is the drive even mounted?
+                if (disks[drive]->isMounted())
                 {
-                        ret = true;
-                        errorCode = ERR_NONE;
+                        if (disks[drive]->write(offset, buf))
+                        {
+                                ret = true;
+                                setError(ERR_NONE);
+                        }
+                        else    // error
+                        {
+                                Serial.println("**** write error ****");
+                                setError(disks[drive]->getError());
+                        }
                 }
-                else    // error
+                else
                 {
-                        Serial.println("**** write error ****");
-                        errorCode = disks[drive]->getError();
+                        setError(ERR_NOT_MOUNTED);
                 }
         }
         else
         {
-                errorCode = ERR_NOT_MOUNTED;
+                setError(ERR_BAD_DRIVE);
         }
 
         return ret;
@@ -510,10 +532,244 @@ bool Disks::write(byte drive, unsigned long offset, byte *buf)
 
 byte Disks::getStatus(byte drive)
 {
-        return disks[drive]->getStatus();
+        if (isDriveValid(drive))
+        {
+                return disks[drive]->getStatus();
+        }
+        else
+        {
+                return 0x80;
+        }
+}
+
+
+//=============================================================================
+// This is called to format (create) a new disk image.
+// Returns false on error
+
+bool Disks::format(char *filename, int tracks, int sectors, byte fillPattern)
+{
+        bool ret = true;    // assume no error
+
+        Serial.print("Got format request for filename \"");
+        Serial.print(filename);
+        Serial.print("\": ");
+        Serial.print(tracks);
+        Serial.print(" tracks, ");
+        Serial.print(sectors);
+        Serial.print(" sectors, fillPattern = 0x");
+        Serial.print(fillPattern, HEX);
+        Serial.println("");
+
+        // If the file already exists, fail
+
+        if (SD.exists(filename))
+        {
+                Serial.println("File exists!");
+                setError(ERR_FILE_EXISTS);
+                ret = false;
+        }
+        else
+        {
+                // Open the file for writing
+
+                file = SD.open(filename, FILE_WRITE);
+
+                if (!file)
+                {
+                        Serial.println("Error opening file!");
+                        setError(ERR_WRITE_ERROR);
+                        ret = false;
+                }
+                else
+                {
+                        // Fill sector buffer
+
+                        memset(buffer, fillPattern, SECTOR_SIZE);
+
+                        for (int i = 0; i < tracks*sectors; i++)
+                        {
+                                if (SECTOR_SIZE != file.write(buffer, SECTOR_SIZE))
+                                {
+                                        Serial.println("Error writing to file!");
+                                        setError(ERR_WRITE_ERROR);
+                                        ret = false;
+                                        break;
+                                }
+                        }
+                        file.close();
+                }
+
+        }
+
+        if (ret)
+        {
+                setError(ERR_NONE);
+                Serial.println(" - SUCCESS!");
+        }
+        else
+        {
+                Serial.print(" - FAILED!  Error code ");
+                Serial.println(errorCode);
+        }
+
+        return ret;
+}
+
+
+//=============================================================================
+// This is called to erase a file on the SD card.
+// Returns false on error
+
+bool Disks::erase(char *filename)
+{
+        bool ret = true;    // assume no error
+
+        Serial.print("Got erase request for filename \"");
+        Serial.print(filename);
+        Serial.println("\"");
+
+        // If the file already exists, fail
+
+        if (!SD.exists(filename))
+        {
+                Serial.println("File does not exist!");
+                setError(ERR_FILE_NOT_FOUND);
+                ret = false;
+        }
+        else
+        {
+                if (!SD.remove(filename))
+                {
+                        Serial.println("Error deleting file!");
+                        setError(ERR_WRITE_ERROR);
+                        ret = false;
+                }
+        }
+
+        if (ret)
+        {
+                setError(ERR_NONE);
+                Serial.println(" - SUCCESS!");
+        }
+        else
+        {
+                Serial.print(" - FAILED!  Error code ");
+                Serial.println(errorCode);
+        }
+
+        return ret;
 }
 
 
 
+//=============================================================================
+// This is called to copy or rename a file on the SD card.
+// Returns false on error
+
+bool Disks::copy(char *from, char *dest, bool rename)
+{
+        bool ret = true;
+
+        Serial.print("Got ");
+        if (rename)
+                Serial.print("rename");
+        else
+                Serial.print("copy");
+        Serial.print(" request for filename \"");
+        Serial.print(from);
+        Serial.print("\" to \"");
+        Serial.print(dest);
+        Serial.println("\".");
+
+        if (!SD.exists(from))
+        {
+                Serial.println("File does not exist!");
+                setError(ERR_FILE_NOT_FOUND);
+                ret = false;
+        }
+        else if (SD.exists(dest))
+        {
+                Serial.println("Destination name exist!");
+                setError(ERR_FILE_EXISTS);
+                ret = false;
+        }
+        else
+        {
+                if (rename)
+                        ret = internalRename(from, dest);
+                else
+                        ret = internalCopy(from, dest);
+
+                if (!ret)
+                {
+                        setError(ERR_WRITE_ERROR);
+                }
+        }
+
+        if (ret)
+        {
+                setError(ERR_NONE);
+                Serial.println(" - SUCCESS!");
+        }
+        else
+        {
+                Serial.print(" - FAILED!  Error code ");
+                Serial.println(errorCode);
+        }
+
+        return ret;
+}
 
 
+
+//=============================================================================
+// Utility funtion to copy a file in the SD card.
+// Returns true if success, false if error.
+
+bool Disks::internalCopy(char *from, char *dest)
+{
+        bool ret = true;
+
+        File ofile;
+
+        file = SD.open(from, FILE_READ);
+        ofile = SD.open(dest, FILE_WRITE);
+        if (!ofile || !file)
+        {
+                Serial.print("Failed copying file");
+                file.close();
+                ofile.close();
+                ret = false;
+        }
+        else
+        {
+                while (file.available())
+                {
+                        ofile.write(buffer, file.read(buffer, sizeof(buffer)));
+                }
+
+                ofile.close();
+                file.close();
+        }
+
+        return ret;
+}
+
+
+
+//=============================================================================
+// Utility funtion to rename a file in the SD card.
+// Returns true if success, false if error.
+
+bool Disks::internalRename(char *from, char *dest)
+{
+        bool ret = internalCopy(from, dest);
+
+        if (ret)
+        {
+                SD.remove(from);                // remove the existing file
+        }
+
+        return ret;
+}

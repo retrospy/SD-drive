@@ -68,6 +68,11 @@
 //
 // Revision 1.5:
 //    * Ported to Raspberry Pi Pico
+//
+// Revision 2.0 (Eduardo Casino):
+//    * Bump protocol version to 2. Re-implement GetVersion command.
+//      Strengthen recovery logic when an unexpected event arrives.
+//      Implement the COPY, ERASE, RENAME commands.
 
 #include <Arduino.h>
 
@@ -87,6 +92,9 @@
 #include "Errors.h"
 #include "SdFuncs.h"
 
+// New version info
+#define NEW_VERSION_MAJOR 2
+#define NEW_VERSION_MINOR 0
 
 // Debugging options.  They usually produce lots of serial output so be careful what you turn on.
 
@@ -202,11 +210,16 @@ void setup()
 		#endif
 	
 		Serial.println("");
-		Serial.println("SD Drive version 1.5");
+		Serial.print("SD Drive version ");
+		Serial.print(NEW_VERSION_MAJOR);
+		Serial.print(".");
+		Serial.println(NEW_VERSION_MINOR);
 		Serial.println("Brought to you by Bob Applegate and Corsham Technologies");
 		Serial.println("bob@corshamtech.com, www.corshamtech.com");
 		Serial.println("Updated by Christopher 'Zoggins' Mallery and RetroSpy Technologies");
 		Serial.println("zoggins@retro-spy.com, retro-spy.com");
+		Serial.println("Version 2.X by Eduardo Casino");
+		Serial.println("mail@eduardocasino.es, eduardocasino.es, github.com/eduardocasino");
         
 		// Start up the UI soon so it can display some initial info
 		// while the rest of the system comes up.
@@ -246,7 +259,7 @@ void setup()
 				WhichConfigFile = CONFIG_FILE_ALTERNATE;
 			}
 
-			Serial.print("Option 2: ");
+			Serial.print("Dangerous features: ");
 			Serial.println(debounceInputPin(OPTION_2_PIN) ? "Off" : "On");
 
 			Serial.print("Option 3: ");
@@ -585,9 +598,9 @@ static bool processEvent(Event *ep)
                         
                 case EVT_GET_VERSION:
                 {
-                        ep->clean(EVT_VERSION_INFO);  // same event type but clear all other data
-                        byte *ptr = ep->getData();
-                        strcpy((char *)ptr, "Corsham Technology\r\nv1.4");
+                        ep->clean(EVT_VERSION_INFO);
+                        ep->addByte(NEW_VERSION_MAJOR);
+                        ep->addByte(NEW_VERSION_MINOR);
                         link->sendEvent(ep);
                         break;
                 }
@@ -668,17 +681,36 @@ static bool processEvent(Event *ep)
                         break;
                 }
                         
+                case EVT_FORMAT:
+                        createImage(ep);
+                        break;
+
+                case EVT_ERASE:
+                        eraseFile(ep);
+                        break;
+
+                case EVT_COPY:
+                        copyFile(ep);
+                        break;
+
+                case EVT_RENAME:
+                        renameFile(ep);
+                        break;
+
                 default:
                         // All the unwanted toys end up here.  Maybe a garbage Event,
                         // maybe an old type, or one we haven't implemented yet.
                         //
-                        // This recovery logic should be re-worked.  One solution might
-                        // be to grab/discard bytes until the DIRECTION line changes
+                        // Grab/discard bytes until the DIRECTION line changes
                         // state, then send back a NAK.
                         
                         Serial.print("processEvent: Got unknown event type: 0x");
                         Serial.println(ep->getType(), HEX);
-                        deleteEvent = true;
+                        link->discard();
+                        ep->clean(EVT_NAK);
+                        ep->addByte(ERR_NOT_IMPLEMENTED);
+                        link->sendEvent(ep);
+
                         break;
         }
         return deleteEvent;
@@ -999,6 +1031,133 @@ void sendMounted(void)
         link->sendEvent(eptr);
 }
 
+
+
+
+//=============================================================================
+// This creates a new image
+// If the number of tracks or number of sectors is zero, then that indicates
+// a value of 256.
+
+static void createImage(Event *ep)
+{
+        byte *bptr = ep->getData();     // start of arguments
+        int tracks = (int)(*bptr++);    // number of tracks
+        int sectors = (int)(*bptr++);   // number sectors per track
+        byte filler = *bptr++;          // filler byte
+
+        tracks = tracks ? tracks : 256;
+        sectors = sectors ? sectors : 256;
+
+        if (disks->format((char *)bptr, tracks, sectors, filler))
+        {
+                ep->clean(EVT_ACK);
+        }
+        else
+        {
+                ep->clean(EVT_NAK);
+                ep->addByte(disks->getErrorCode());
+        }
+        link->sendEvent(ep);
+}
+
+
+
+//=============================================================================
+// This erases a file from the SD card
+// As this is a dangerous feature, it will be availabe only if the option
+// switch 2 is enabled.
+
+static void eraseFile(Event *ep)
+{
+        byte *bptr = ep->getData();     // File name
+
+        // Check if the erase feature is enabled
+
+        if (debounceInputPin(OPTION_2_PIN))
+        {
+                Serial.println("Erase feature is disabled");
+                ep->clean(EVT_NAK);
+                ep->addByte(ERR_FEATURE_DISABLED);
+        }
+        else
+        {
+                if (disks->erase((char *)bptr))
+                {
+                        ep->clean(EVT_ACK);
+                }
+                else
+                {
+                        ep->clean(EVT_NAK);
+                        ep->addByte(disks->getErrorCode());
+                }
+        }
+        link->sendEvent(ep);
+}
+
+
+
+//=============================================================================
+// This copies a file in the SD card
+
+static void copyFile(Event *ep)
+{
+        byte *bptr = ep->getData();     // Origin file name
+
+        byte *dest = bptr;              // Destination file name
+        while (*dest++)
+          ;
+
+        if (disks->copy((char *)bptr, (char *)dest, false))
+        {
+                ep->clean(EVT_ACK);
+        }
+        else
+        {
+                ep->clean(EVT_NAK);
+                ep->addByte(disks->getErrorCode());
+        }
+
+        link->sendEvent(ep);
+}
+
+
+
+//=============================================================================
+// This renames a file in the SD card
+// As this is a dangerous feature, it will be availabe only if the option
+// switch 2 is enabled.
+
+static void renameFile(Event *ep)
+{
+        byte *bptr = ep->getData();     // Origin file name
+
+        byte *dest = bptr;              // Destination file name
+        while (*dest++)
+          ;
+
+        // Check if the rename feature is enabled
+
+        if (debounceInputPin(OPTION_2_PIN))
+        {
+                Serial.println("Rename feature is disabled");
+                ep->clean(EVT_NAK);
+                ep->addByte(ERR_FEATURE_DISABLED);
+        }
+        else
+        {
+                if (disks->copy((char *)bptr, (char *)dest, true))
+                {
+                        ep->clean(EVT_ACK);
+                }
+                else
+                {
+                        ep->clean(EVT_NAK);
+                        ep->addByte(disks->getErrorCode());
+                }
+        }
+        link->sendEvent(ep);
+}
 
 
 

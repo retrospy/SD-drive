@@ -63,7 +63,7 @@
 
 extern unsigned getSectorSize(byte code);
 
-#define PROTOCOL_VERSION 1
+#define PROTOCOL_VERSION 2
 
 extern bool debounceInputPin(int pin);
 
@@ -113,6 +113,10 @@ typedef enum
         STATE_GET_DRV_NAME,  // get drive number
         STATE_APPEND_SECTOR, // add sector data to end
         STATE_GET_LENGTH,
+        STATE_GET_TRACKS,
+        STATE_GET_SECTORS,
+        STATE_GET_FILLER,
+        STATE_WAIT_NULL_TWO, // get two null-terminated strings
 } STATE;
 
 
@@ -542,10 +546,61 @@ void Link::stateMachine(word token)
                                         state = STATE_GET_ONE;
                                         break;
 
+                                case PROTO_FORMAT:      // Create/format an image
+                                        Serial.println("Got a FORMAT");
+                                        // Next is the number of tracks,
+                                        // then the number of sectors,
+                                        // then the filler byte
+                                        // and then the filename to format/create
+                                        event = getAnEvent();
+                                        event->clean(EVT_FORMAT);
+                                        hasEvent = false;
+                                        state = STATE_GET_TRACKS;
+                                        break;
+
+                                case PROTO_ERASE:      // Delete a file
+                                        Serial.println("Got an ERASE");
+                                        // Next is the file name to delete
+                                        event = getAnEvent();
+                                        event->clean(EVT_ERASE);
+                                        hasEvent = false;
+                                        state = STATE_WAIT_NULL;
+                                        break;
+
+                                case PROTO_COPY:       // Copy a file
+                                        Serial.println("Got a COPY");
+                                        // Next are the origin file name,
+                                        // then the destination one
+                                        event = getAnEvent();
+                                        event->clean(EVT_COPY);
+                                        hasEvent = false;
+                                        state = STATE_WAIT_NULL_TWO;
+                                        break;
+
+                                case PROTO_RENAME:     // Rename a file
+                                        Serial.println("Got a RENAME");
+                                        // Next are the origin file name,
+                                        // then the destination one
+                                        event = getAnEvent();
+                                        event->clean(EVT_RENAME);
+                                        hasEvent = false;
+                                        state = STATE_WAIT_NULL_TWO;
+                                        break;
+
                                 default:
                                         Serial.print("Got unknown command code: ");
                                         Serial.println((byte)token, HEX);
-                                        transactionDone = true;
+                                        if (token != 0 && token != 0xff)
+                                        {
+                                                event = getAnEvent();
+                                                event->clean(EVT_UNKNOWN_COMMAND);
+                                                hasEvent = true;
+                                        }
+                                        else
+                                        {
+                                                // Spurious read
+                                                transactionDone = true;
+                                        }
                         }
                         break;
                         
@@ -647,6 +702,32 @@ void Link::stateMachine(word token)
                         event->addByte(token);
                         state = STATE_APPEND_SECTOR;
                         break;
+
+                case STATE_GET_TRACKS:
+                        event->addByte(token);
+                        state = STATE_GET_SECTORS;
+                        break;
+
+                case STATE_GET_SECTORS:
+                        event->addByte(token);
+                        state = STATE_GET_FILLER;
+                        break;
+
+                case STATE_GET_FILLER:
+                        event->addByte(token);
+                        state = STATE_WAIT_NULL;
+                        break;
+
+                case STATE_WAIT_NULL_TWO:
+                        // This keeps adding bytes until a 0x00 is seen, then
+                        // go gets another.
+
+                        event->addByte(token);    // always add it, even if null
+                        if (token == 0x00)        // if null, end of the data
+                        {
+                                state = STATE_WAIT_NULL;
+                        }
+                        break;
         }
         
         // If this is the end of a transaction, indicate it on the UI.
@@ -667,7 +748,7 @@ void Link::stateMachine(word token)
 
 void Link::sendEvent(Event *eptr)
 {
-        byte *bptr;
+        byte *dptr;
         
         prepareWrite();    // get ready to write and for host to read
         
@@ -683,8 +764,8 @@ void Link::sendEvent(Event *eptr)
                         // reason byte.
                         
                         writeByte(PROTO_NAK);    // NAK
-                        bptr = eptr->getData();
-                        writeByte(*bptr);  // reason code
+                        dptr = eptr->getData();
+                        writeByte(*dptr);  // reason code
                         break;
                         
                 case EVT_FILE_DATA:
@@ -695,7 +776,7 @@ void Link::sendEvent(Event *eptr)
                         // length can be zero, indicating end of file.
                         
                         writeByte(PROTO_FILE_DATA);    // send the command
-                        byte *dptr= eptr->getData();  // pointer to the data
+                        dptr= eptr->getData();  // pointer to the data
                         byte msgLength = *dptr++;  // number of bytes to send
                         writeByte(msgLength);    // length of data to follow
                         while (msgLength--)
@@ -726,7 +807,7 @@ void Link::sendEvent(Event *eptr)
                         // Sector data heading back to host.  Always 256 bytes.
                         
                         writeByte(PROTO_SECTOR_DATA);
-                        byte *dptr = eptr->getData();
+                        dptr = eptr->getData();
                         unsigned int size = getSectorSize(*dptr++);
                         while (size--)
                         {
@@ -738,7 +819,7 @@ void Link::sendEvent(Event *eptr)
                 case EVT_DISK_STATUS:
                 {
                         writeByte(PROTO_STATUS);
-                        byte *dptr = eptr->getData();
+                        *dptr = eptr->getData();
                         writeByte(*dptr++);
                         break;
                 }
@@ -746,7 +827,7 @@ void Link::sendEvent(Event *eptr)
                 case EVT_MOUNTED:
                 {
                         writeByte(PROTO_MOUNT_INFO);
-                        byte *dptr = eptr->getData();
+                        *dptr = eptr->getData();
                         writeByte(*dptr++);   // drive number
                         writeByte(*dptr++);   // read-only flag
                         while (*dptr)
@@ -759,11 +840,21 @@ void Link::sendEvent(Event *eptr)
 
                 case EVT_CLOCK_DATA:
                         writeByte(PROTO_CLOCK_DATA);
-                        byte *dptr = eptr->getData();
+                        *dptr = eptr->getData();
                         for (int i = 0; i < 8; i++)
                         {
                                 writeByte(*dptr++);
                         }
+                        break;
+
+                case EVT_VERSION_INFO:
+                        // A VERSION_INFO is followed by two bytes:
+                        // major and minor version codes.
+
+                        writeByte(PROTO_VERSION);       // Version info follows
+                        dptr = eptr->getData();
+                        writeByte(*dptr++);             // Major
+                        writeByte(*dptr);               // Minor
                         break;
         }
         
@@ -795,4 +886,34 @@ Event *Link::getAnEvent(void)
 void Link::freeAnEvent(Event *eptr)
 {
         freeEvent = eptr;
+}
+
+
+
+
+//=============================================================================
+// This is function discards all the incoming data until the DIRECTION line
+// gives us control.  Use it for recovery when an unknown command/event comes
+// from the host
+
+void Link::discard(void)
+{
+        unsigned long nextPoll = millis();
+
+        while (debounceInputPin(DIRECTION))
+        {
+                if (nextPoll <= millis())
+                {
+                        nextPoll = millis() + 10;       // Poll each 10ms
+
+                        if (debounceInputPin(STROBE))
+                        {
+                                // There is a strobe, so get the byte from the host
+
+                                byte data = readByte();
+                                Serial.print("Discarding byte: 0x");
+                                Serial.println(data, HEX);
+                        }
+                }
+        }
 }
